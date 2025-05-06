@@ -1,0 +1,4 @@
+[USBIP]
+server = kdesktop
+device_id = 25a7:fa68
+busid = 4-2

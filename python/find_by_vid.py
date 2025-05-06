@@ -155,22 +155,29 @@ def main():
             config = read_config()
             
             server = config['server']
-            busid_file = config.get( 'busid' , None)
-            found_busid = None
-            if "device_id" in config:
-                device_id = config['device_id']
-                found_busid = busid = get_busid_for_device(server, device_id)       
-                if found_busid:logging.info("Found busid from device id ")
-                else: logging.info(f"busid from device id {device_id} not found")
+            
+            def busid_file(): return config.get( 'busid' , None)
+            
+            def find_by_device_id():
+                if "device_id" in config:
+                    device_id = config['device_id']
+                    busid_device_id = busid = get_busid_for_device(server, device_id)       
+                    if busid_device_id:logging.info("Found busid from device id ")
+                    else: logging.info(f"busid from device id {device_id} not found")
+                    return busid_device_id
                 
-            elif not busid_file:
-                found_busid = get_first_usbip_device()
-                if found_busid:  logging.info(f"First USB device: {found_busid} / {busid_file}")
+            def first_first():
+                first_found_busid = get_first_usbip_device()
+                if first_found_busid:  logging.info(f"First USB device: {first_found_busid}")
                 else:  logging.info("No USB devices found or error occurred")
-                
-            busid =   found_busid or  busid_file
-
-            return_code = run_usbip_command(server, busid)
+                return first_found_busid
+            logging.info("")
+            for i, func in enumerate( [ busid_file,  find_by_device_id, first_first]):
+                logging.info(f"Attempt {i}")
+                busid = func()
+                if not busid: continue
+                return_code = run_usbip_command(server, busid)
+                if return_code == 0: break
 
             time.sleep(1)
         sys.exit(return_code)

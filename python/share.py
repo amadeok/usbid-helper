@@ -23,12 +23,12 @@ def is_admin():
         return False
 
 if not is_admin():
-    # Re-run the program with admin rights
-    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    input("need admin rights")
+    # ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
     sys.exit()
     
 command =  ["usbipd", "bind", "-i", args.id, "--force"]
-
+print("command", command)
 process = subprocess.Popen(
     command,
     text=True,
@@ -37,7 +37,7 @@ process = subprocess.Popen(
 )
         
 ret = process.wait()
-print("error")
 if ret != 0:
+    print("error")
     input()
 
